@@ -25,7 +25,9 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/app/turf-booking/turf-booking-base.css",
+              "src/app/turf-booking/turf-booking.component.css"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",

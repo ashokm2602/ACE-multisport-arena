@@ -1,0 +1,5 @@
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="Ace Multisport Arena home"><span class="brand-mark">A</span><span>ACE <small>MULTISPORT ARENA</small></span></a>
+  <button class="menu-toggle" type="button" (click)="open = !open" [attr.aria-expanded]="open" aria-label="Toggle navigation">{{ open ? 'CLOSE' : 'MENU' }}</button>
+  <nav [class.open]="open" aria-label="Main navigation"><a routerLink="/" (click)="open=false">Home</a><a routerLink="/gym" (click)="open=false">Gym</a><a routerLink="/turf" (click)="open=false">Turf</a><a class="nav-cta" routerLink="/turf" (click)="open=false">Book a Slot</a></nav>
+</header>
