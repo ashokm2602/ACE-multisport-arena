@@ -2,6 +2,23 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
 
+## Booking foundation
+
+The booking screens, admin pages, and service contracts are a frontend scaffold. The turf picker uses illustrative slot states and an illustrative INR/hour figure. It does not reserve slots, create bookings, or collect payment. Auth and route guards only shape navigation; a backend must authenticate users and authorize every protected operation.
+
+Set `apiBaseUrl` in `src/environments/environment.ts` and `environment.production.ts` when the API host is agreed. No credentials belong in these files. Service integration points are documented in `src/app/core/services/`.
+
+Proposed backend endpoints:
+
+- `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/logout`, `GET /api/auth/me`
+- `GET /api/turfs`, `GET /api/turfs/{id}/slots`, `POST /api/bookings`, `GET /api/bookings/mine`
+- `GET /api/admin/bookings`, `POST /api/admin/bookings/reserve`, `POST /api/admin/slots/block`, `POST /api/admin/slots/unblock`
+- `GET /api/admin/pricing`, `PUT /api/admin/pricing`, `GET /api/users`
+- `POST /api/payments/create-order`, `POST /api/payments/verify`, `GET /api/payments/{id}`
+- `POST /api/notifications/booking-confirmation`
+
+The backend must own slot locking, price validation, Razorpay signature verification, notification credentials, and role/permission enforcement. These endpoints are proposals and are not called by the current UI.
+
 ## Development server
 
 To start a local development server, run:
