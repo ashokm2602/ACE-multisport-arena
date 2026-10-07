@@ -1,0 +1,4 @@
+*.bin
+/Ace-Turf-Backend/.vs
+/Ace-Turf-Backend/bin
+/Ace-Turf-Backend/obj

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ace_Multisports_backend.Models;
+namespace Ace_Turf_Backend.Models;
 
 public class Payment
 {
