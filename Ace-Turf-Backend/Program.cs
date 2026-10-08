@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Negotiate;
+﻿using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.EntityFrameworkCore;
 using Ace_Turf_Backend.Models;
+using Ace_Turf_Backend.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,5 +37,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapTurfSlotEndpoints();
 
 app.Run();
