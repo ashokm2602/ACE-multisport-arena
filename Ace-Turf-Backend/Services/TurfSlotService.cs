@@ -65,72 +65,69 @@ namespace Ace_Turf_Backend.Services
                                  .ToListAsync();
         }
 
-        Task<List<TurfSlot>> ITurfSlotServicecs.GetTurfSlotsByDateAsync(DateTime date)
+        public async Task CreateTurfSlotsForDateAsync(DateTime date)
+                {
+                    var today = DateTime.Today;
+                    var endDate = date.Date;
+
+                    var existingSlots = await _context.TurfSlots
+                        .Where(ts => ts.SlotDate >= today &&
+                                     ts.SlotDate < endDate)
+                        .Select(ts => new
+                        {
+                            SlotDate = ts.SlotDate.Date,
+                            ts.StartTime,
+                            ts.EndTime
+                        })
+                        .ToListAsync();
+
+                    var existingSlotKeys = existingSlots
+                        .Select(s => (s.SlotDate, s.StartTime, s.EndTime))
+                        .ToHashSet();
+
+                    var newSlots = new List<TurfSlot>();
+
+                    for (var d = today; d < endDate; d = d.AddDays(1))
+                    {
+                        for (var hour = 0; hour < 24; hour++)
+                        {
+                            var startTime = TimeSpan.FromHours(hour);
+                            var endTime = startTime.Add(TimeSpan.FromHours(1));
+
+                            var key = (d, startTime, endTime);
+
+                            if (existingSlotKeys.Contains(key))
+                                continue;
+
+                            newSlots.Add(new TurfSlot
+                            {
+                                SlotDate = d,
+                                StartTime = startTime,
+                                EndTime = endTime,
+                                Price = 100.00m,
+                                IsAvailable = true,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                    }
+
+                    if (newSlots.Count > 0)
+                    {
+                        _context.TurfSlots.AddRange(newSlots);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+        public async Task<List<TurfSlot>> GetTurfSlotsByDateAsync(DateTime date)
         {
-            throw new NotImplementedException();
+               return await _context.TurfSlots
+                                 .Where(ts => ts.SlotDate.Date == date.Date)
+                                 .ToListAsync();
         }
+
+        
     }
 
+}
 
-public static class TurfSlotEndpoints
-{
-	public static void MapTurfSlotEndpoints (this IEndpointRouteBuilder routes)
-    {
-        var group = routes.MapGroup("/api/TurfSlot").WithTags(nameof(TurfSlot));
 
-        group.MapGet("/", async (AppDbContext db) =>
-        {
-            return await db.TurfSlots.ToListAsync();
-        })
-        .WithName("GetAllTurfSlots")
-        .WithOpenApi();
-
-        group.MapGet("/{id}", async Task<Results<Ok<TurfSlot>, NotFound>> (long id, AppDbContext db) =>
-        {
-            return await db.TurfSlots.AsNoTracking()
-                .FirstOrDefaultAsync(model => model.Id == id)
-                is TurfSlot model
-                    ? TypedResults.Ok(model)
-                    : TypedResults.NotFound();
-        })
-        .WithName("GetTurfSlotById")
-        .WithOpenApi();
-
-        group.MapPut("/{id}", async Task<Results<Ok, NotFound>> (long id, TurfSlot turfSlot, AppDbContext db) =>
-        {
-            var affected = await db.TurfSlots
-                .Where(model => model.Id == id)
-                .ExecuteUpdateAsync(setters => setters
-                  .SetProperty(m => m.Id, turfSlot.Id)
-                  .SetProperty(m => m.SlotDate, turfSlot.SlotDate)
-                  .SetProperty(m => m.StartTime, turfSlot.StartTime)
-                  .SetProperty(m => m.EndTime, turfSlot.EndTime)
-                  .SetProperty(m => m.Price, turfSlot.Price)
-                  .SetProperty(m => m.IsAvailable, turfSlot.IsAvailable)
-                  .SetProperty(m => m.CreatedAt, turfSlot.CreatedAt)
-                  );
-            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
-        })
-        .WithName("UpdateTurfSlot")
-        .WithOpenApi();
-
-        group.MapPost("/", async (TurfSlot turfSlot, AppDbContext db) =>
-        {
-            db.TurfSlots.Add(turfSlot);
-            await db.SaveChangesAsync();
-            return TypedResults.Created($"/api/TurfSlot/{turfSlot.Id}",turfSlot);
-        })
-        .WithName("CreateTurfSlot")
-        .WithOpenApi();
-
-        group.MapDelete("/{id}", async Task<Results<Ok, NotFound>> (long id, AppDbContext db) =>
-        {
-            var affected = await db.TurfSlots
-                .Where(model => model.Id == id)
-                .ExecuteDeleteAsync();
-            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
-        })
-        .WithName("DeleteTurfSlot")
-        .WithOpenApi();
-    }
-}}

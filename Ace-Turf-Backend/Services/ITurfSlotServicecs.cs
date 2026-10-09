@@ -7,6 +7,8 @@ namespace Ace_Turf_Backend.Services
         public Task<List<TurfSlot>> GetAllTurfSlotsAsync();
         public Task<TurfSlot> GetTurfSlotByIdAsync(long id);
         public Task<TurfSlot> CreateTurfSlotAsync(DateTime date);
+        public Task CreateTurfSlotsForDateAsync(DateTime date);
+
         public Task DeleteTurfSlotAsync(long id);
         public Task<TurfSlot> UpdateTurfSlotAsync(long id, TurfSlot turfSlot);
         public Task<List<TurfSlot>> GetAvailableTurfSlotsAsync(DateTime date);
