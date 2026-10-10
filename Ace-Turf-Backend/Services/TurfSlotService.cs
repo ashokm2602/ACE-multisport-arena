@@ -92,7 +92,7 @@ namespace Ace_Turf_Backend.Services
                         for (var hour = 0; hour < 24; hour++)
                         {
                             var startTime = TimeSpan.FromHours(hour);
-                            var endTime = startTime.Add(TimeSpan.FromHours(1));
+                            var endTime = hour == 23 ? TimeSpan.Zero : TimeSpan.FromHours(hour + 1);
 
                             var key = (d, startTime, endTime);
 
