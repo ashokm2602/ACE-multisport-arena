@@ -64,7 +64,13 @@ namespace Ace_Turf_Backend.Services
                                  .Where(ts => ts.SlotDate.Date == date.Date && ts.IsAvailable)
                                  .ToListAsync();
         }
-
+        
+        public async Task<List<TurfSlot>> GetBookedTurfSlotsAsync(DateTime date)
+        {
+            return await _context.TurfSlots
+                                 .Where(ts => ts.SlotDate.Date == date.Date && !ts.IsAvailable)
+                                 .ToListAsync();
+        }
         public async Task CreateTurfSlotsForDateAsync(DateTime date)
                 {
                     var today = DateTime.Today;

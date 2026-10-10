@@ -72,6 +72,13 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(availableTurfSlots);
         }
 
+        [HttpGet("turfSlot/GetBooked/{date}")]
+        public async Task<ActionResult<List<TurfSlot>>> GetBookedTurfSlots(DateTime date)
+        {
+            var bookedTurfSlots = await _turfSlotService.GetBookedTurfSlotsAsync(date);
+            return Ok(bookedTurfSlots);
+        }
+
         [HttpPost("turfSlot/CreateForDate/{date}")]
         public async Task<IActionResult> CreateTurfSlotsForDate(DateTime date)
         {
