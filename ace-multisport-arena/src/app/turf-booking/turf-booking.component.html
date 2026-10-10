@@ -1,11 +1,100 @@
 <main class="booking-page">
-  <header class="booking-header"><a class="booking-brand" routerLink="/" aria-label="Ace Multisports Arena home"><span class="booking-mark">A</span><span>ACE <small>MULTISPORTS ARENA</small></span></a><a class="back-home" routerLink="/">Back to arena</a></header>
-  <section class="booking-intro"><p class="booking-tag">ACE TURF</p><h1>BOOK YOUR<br><span>GAME TIME.</span></h1><p>Select a date and time slots to see your booking summary.</p></section>
-  <p class="preview-note"><strong>Booking preview</strong> — times shown are illustrative. Live availability and booking confirmation are not connected yet.</p>
-  <div class="booking-layout">
-    <section class="panel date-panel" aria-labelledby="date-heading"><h2 id="date-heading">Select date</h2><label for="booking-date">Choose your play date</label><input id="booking-date" type="date" [min]="minDate" [(ngModel)]="selectedDate" (ngModelChange)="selectedSlots = []"><p class="panel-note">Choose a date to view the sample time slots.</p><div class="how-panel"><h3>How it works</h3><ol><li>Select your preferred date.</li><li>Choose one or more time slots.</li><li>Review the summary before booking goes live.</li></ol></div></section>
-    <section class="slots-panel" aria-labelledby="slots-heading"><div class="slots-title"><div><p class="booking-tag">PICK YOUR TIME</p><h2 id="slots-heading">Available slots</h2></div><div class="slot-legend"><span><i></i> Sample slot</span><span><i class="legend-selected"></i> Selected</span></div></div><p class="slots-hint">{{ selectedDate ? readableDate : 'Select a date to continue' }}</p><div class="slot-grid"><button type="button" class="slot" [class.selected]="selectedSlots.includes(hour)" [disabled]="!selectedDate" [attr.aria-pressed]="selectedSlots.includes(hour)" (click)="toggleSlot(hour)" *ngFor="let hour of hours"><span>{{ formatHour(hour) }}</span><small>1 hour</small></button></div></section>
-    <aside class="panel summary-panel" aria-labelledby="summary-heading"><p class="booking-tag">YOUR SELECTION</p><h2 id="summary-heading">Booking summary</h2><dl><div><dt>Date</dt><dd>{{ readableDate }}</dd></div><div><dt>Selected slots</dt><dd>{{ selectedSlots.length }}</dd></div></dl><ul class="summary-slots" *ngIf="selectedSlots.length"><li *ngFor="let hour of selectedSlots">{{ formatHour(hour) }}</li></ul><p class="summary-empty" *ngIf="!selectedSlots.length">Choose a date and time slots to build your summary.</p><button class="continue-button" type="button" disabled>Booking coming soon</button><p class="summary-footnote">Booking confirmation will be available once the booking system is connected.</p></aside>
+  <div class="booking-toast" *ngIf="toastMessage" role="status" aria-live="polite">
+    <span class="toast-mark" aria-hidden="true">✓</span><span>{{ toastMessage }}</span>
+    <button type="button" aria-label="Dismiss message" (click)="dismissToast()">×</button>
   </div>
-  <footer class="booking-footer"><span>ACE MULTISPORT ARENA</span><a routerLink="/gym">Gym — Coming soon</a></footer>
+  <header class="booking-header">
+    <a class="booking-brand" routerLink="/" aria-label="ACE Multisport Arena home">
+      <span class="booking-mark">A</span><span>ACE <small>MULTISPORTS ARENA</small></span>
+    </a>
+    <a class="back-home" routerLink="/">Back to arena <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <section class="booking-intro">
+    <div class="intro-copy">
+      <p class="booking-tag">ACE Turf booking</p>
+      <h1>OWN THE<br><span>HOUR.</span></h1>
+      <p>Your game. Your time. Your arena.</p>
+      <div class="intro-meta"><span><i></i> 60-minute sessions</span><span><i></i> Weekday ₹600 · Weekend ₹750</span></div>
+      <nav class="booking-progress" aria-label="Choose Day → Pick Hours → Review"><span class="progress-current">Choose Day</span><b aria-hidden="true">→</b><span>Pick Hours</span><b aria-hidden="true">→</b><span>Review</span></nav>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="stadium-glow glow-one"></div><div class="stadium-glow glow-two"></div>
+      <div class="field-perspective"><div class="field-deck"><i class="field-halfway"></i><i class="field-circle"></i><i class="field-box box-left"></i><i class="field-box box-right"></i><i class="field-spot spot-left"></i><i class="field-spot spot-right"></i></div></div>
+      <span class="field-caption">ACE ARENA <b>·</b> YOUR NEXT MATCH</span>
+      <span class="field-orbit orbit-a"></span><span class="field-orbit orbit-b"></span>
+    </div>
+  </section>
+
+  <p class="preview-note"><span class="preview-dot"></span><strong>Preview mode</strong><span>Slot availability is illustrative. Live court inventory and booking confirmation are not connected yet.</span></p>
+
+  <section class="date-section" aria-labelledby="date-heading">
+    <div class="section-heading">
+      <div><p class="booking-tag">01 — Date</p><h2 id="date-heading">Pick Your Day</h2></div>
+      <span class="window-label">14-DAY BOOKING WINDOW</span>
+    </div>
+    <div class="date-selector">
+      <button class="date-arrow" type="button" aria-label="Previous dates" [disabled]="!canGoPrevious" (click)="moveDateWindow(-1)">‹</button>
+      <div class="date-track" aria-label="Bookable dates">
+        <button *ngFor="let date of visibleDates" type="button" class="date-card" [class.active]="selectedDate === dateKey(date)" [attr.aria-pressed]="selectedDate === dateKey(date)" (click)="onDateChange(dateKey(date))">
+          <span class="date-weekday">{{ formatDate(date, { weekday: 'short' }) }}</span>
+          <strong>{{ formatDate(date, { day: '2-digit' }) }}</strong>
+          <span class="date-month">{{ formatDate(date, { month: 'short' }) }}</span>
+        </button>
+      </div>
+      <button class="date-arrow" type="button" aria-label="Next dates" [disabled]="!canGoNext" (click)="moveDateWindow(1)">›</button>
+    </div>
+  </section>
+
+  <div class="booking-layout">
+    <section class="slots-panel" aria-labelledby="slots-heading">
+      <div class="section-heading slots-heading">
+        <div><p class="booking-tag">02 — Time</p><h2 id="slots-heading">Choose Your Play Window</h2></div>
+        <span class="slots-date">{{ hasAllowedDate ? readableDate : 'Select a date above' }}</span>
+      </div>
+
+      <div class="period-filters" role="group" aria-label="ACE play windows">
+        <button *ngFor="let period of periods" type="button" class="period-filter" [class.active]="selectedPeriod === period.id" [attr.aria-pressed]="selectedPeriod === period.id" (click)="selectPeriod(period.id)">
+          <span class="period-icon" aria-hidden="true">{{ period.icon }}</span><span class="period-copy"><strong>{{ period.label }}</strong><span>{{ formatHour(period.start) }}–{{ formatHour(period.end % 24) }}</span></span>
+        </button>
+      </div>
+
+      <div class="timeline-header"><span class="slots-label">Available to Play</span><span class="timeline-legend"><i class="legend-available"></i> Available <i class="legend-unavailable"></i> Unavailable</span></div>
+      <div class="timeline-scroll" *ngIf="hasAllowedDate; else datePrompt">
+        <div class="slot-timeline" *ngIf="hasAvailablePeriodSlots; else unavailablePrompt">
+          <div class="slot-action-wrap" *ngFor="let hour of periodSlots" (pointerdown)="onSlotPointerDown(hour)">
+            <button type="button" class="time-slot" [class.selected]="isSlotSelected(hour)" [class.unavailable]="!isSlotAvailable(hour)" [disabled]="!isSlotAvailable(hour)" [attr.aria-pressed]="isSlotSelected(hour)" [attr.aria-label]="formatSlotRange(hour) + ', ' + formatCurrency(priceForDate(selectedDate)) + (isSlotAvailable(hour) ? (isSlotSelected(hour) ? ', in selected range' : ', available in preview') : ', unavailable')" (click)="trySelectSlot(hour)">
+              <span class="slot-range">{{ formatSlotRange(hour) }}</span><span class="slot-price">{{ formatCurrency(priceForDate(selectedDate)) }}</span><span class="slot-state">{{ !isSlotAvailable(hour) ? 'Unavailable' : (isSlotSelected(hour) ? '✓ In range' : 'Available') }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #unavailablePrompt><div class="empty-timeline"><strong>No sample slots available in this period</strong><p>Try another time filter.</p></div></ng-template>
+      <ng-template #datePrompt><div class="empty-timeline"><span class="empty-calendar">▦</span><strong>Select a date to view the timeline</strong><p>Choose any day from today through {{ maxDate }}.</p></div></ng-template>
+      <p class="timeline-footnote" *ngIf="hasAllowedDate">Unavailable examples are part of the preview and may not reflect real court bookings.</p>
+    </section>
+
+    <aside class="panel summary-panel" aria-labelledby="summary-heading">
+      <p class="booking-tag">03 — Review</p><h2 id="summary-heading">Your Play Plan</h2>
+      <p class="range-display" *ngIf="selectedRange">{{ selectedRangeDisplay }}</p>
+      <dl>
+        <div><dt>Date</dt><dd>{{ summaryDate }}</dd></div>
+        <div><dt>Starts</dt><dd>{{ selectionStartTime }}</dd></div>
+        <div><dt>Ends</dt><dd>{{ selectionEndTime }}</dd></div>
+        <div><dt>Total duration</dt><dd>{{ selectedDurationHours }} {{ selectedDurationHours === 1 ? 'hour' : 'hours' }}</dd></div>
+        <div><dt>Hourly rate</dt><dd>{{ selectedDurationHours ? formatCurrency(selectedHourlyPrice) : '—' }}</dd></div>
+        <div><dt>Hourly slots</dt><dd>{{ selectedSlots.length }}</dd></div>
+        <div><dt>Estimated total</dt><dd class="summary-total">{{ formatCurrency(estimatedTotal) }}</dd></div>
+      </dl>
+      <ul class="summary-slots" *ngIf="selectedSlots.length; else summaryEmpty">
+        <li *ngFor="let slot of selectedSlots"><strong>{{ formatSlotRange(slot.hour) }}</strong><span>{{ formatCurrency(priceForDate(slot.date)) }}</span></li>
+      </ul>
+      <ng-template #summaryEmpty><p class="summary-empty">Your game is taking shape.</p></ng-template>
+      <button *ngIf="selectedSlots.length" type="button" class="clear-selection" (click)="clearSelection()">Clear selection</button>
+      <button class="continue-button" type="button" [disabled]="!selectedSlots.length || !bookingEnabled">Lock In Your Slot <span aria-hidden="true">→</span></button>
+      <p class="summary-footnote">Final booking confirmation is not connected yet. Your selection is a preview and has not been saved.</p>
+    </aside>
+  </div>
+
+  <footer class="booking-footer"><span>ACE MULTISPORT ARENA</span><a routerLink="/gym">Gym · Coming soon</a></footer>
 </main>
