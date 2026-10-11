@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Ace_Turf_Backend.Models;
 using Ace_Turf_Backend.Services;
 
@@ -14,6 +15,7 @@ namespace Ace_Turf_Backend.Controllers
         {
             _turfSlotService = turfSlotService;
         }
+        [AllowAnonymous]
         [HttpGet("turfSlot/GetAll")]
         public async Task<ActionResult<List<TurfSlot>>> GetAllTurfSlots()
         {
@@ -21,6 +23,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(turfSlots);
         }
 
+        [AllowAnonymous]
         [HttpGet("turfSlot/GetById/{id}")]
         public async Task<ActionResult<TurfSlot>> GetTurfSlotById(long id)
         {
@@ -32,6 +35,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(turfSlot);
         }
 
+        [AllowAnonymous]
         [HttpGet("turfSlot/GetByDate/{date}")]
         public async Task<ActionResult<List<TurfSlot>>> GetTurfSlotsByDate(DateTime date)
         {
@@ -65,6 +69,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(updatedTurfSlot);
         }
 
+        [AllowAnonymous]
         [HttpGet("turfSlot/GetAvailable/{date}")]
         public async Task<ActionResult<List<TurfSlot>>> GetAvailableTurfSlots(DateTime date)
         {
@@ -72,6 +77,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(availableTurfSlots);
         }
 
+        [AllowAnonymous]
         [HttpGet("turfSlot/GetBooked/{date}")]
         public async Task<ActionResult<List<TurfSlot>>> GetBookedTurfSlots(DateTime date)
         {
