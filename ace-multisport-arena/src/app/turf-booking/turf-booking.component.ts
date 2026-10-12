@@ -31,10 +31,10 @@ export class TurfBookingComponent {
     this.loadingSlots.set(Boolean(date));
     if (!date) return;
 
-    this.turfSlotService.getAvailableByDate(date).subscribe({
+    this.turfSlotService.getByDate(date).subscribe({
       next: (slots) => {
         if (request !== this.requestNumber) return;
-        this.slots.set(slots);
+        this.slots.set([...slots].sort((a, b) => a.startTime.localeCompare(b.startTime)));
         this.loadingSlots.set(false);
       },
       error: () => {
