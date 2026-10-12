@@ -1,4 +1,7 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 
 namespace Ace_Turf_Backend.Models;
 
@@ -22,7 +25,9 @@ public class TurfSlot
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation property
+    // Navigation
+    // 
+    [JsonIgnore]
     public ICollection<BookingItem> BookingItems { get; set; }
         = new List<BookingItem>();
 }
