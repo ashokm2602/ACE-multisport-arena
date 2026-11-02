@@ -43,7 +43,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(turfSlots);
         }
 
-
+        [AllowAnonymous]
         [HttpPost("turfSlot/Create")]
         public async Task<ActionResult<TurfSlot>> CreateTurfSlot([FromBody] DateTime date)
         {
@@ -51,6 +51,7 @@ namespace Ace_Turf_Backend.Controllers
             return CreatedAtAction(nameof(GetTurfSlotById), new { id = turfSlot.Id }, turfSlot);
         }
 
+        [AllowAnonymous]
         [HttpDelete("turfSlot/Delete/{id}")]
         public async Task<IActionResult> DeleteTurfSlot(long id)
         {
@@ -58,6 +59,7 @@ namespace Ace_Turf_Backend.Controllers
             return NoContent();
         }
 
+        [AllowAnonymous]
         [HttpPut("turfSlot/Update/{id}")]
         public async Task<ActionResult<TurfSlot>> UpdateTurfSlot(long id, [FromBody] TurfSlot turfSlot)
         {
@@ -85,6 +87,7 @@ namespace Ace_Turf_Backend.Controllers
             return Ok(bookedTurfSlots);
         }
 
+        [AllowAnonymous]
         [HttpPost("turfSlot/CreateForDate/{date}")]
         public async Task<IActionResult> CreateTurfSlotsForDate(DateTime date)
         {
